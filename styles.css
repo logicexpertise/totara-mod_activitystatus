@@ -1,0 +1,100 @@
+#page-mod-activitystatus-mod .statusimagesettings .modsheader{
+    font-weight: 700;
+    font-size: 120%;
+    border-bottom: 1px solid #BFBFBF;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings .mods {
+    margin-top: 10px;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings .modname {
+    font-weight: 600;
+    font-size: 110%;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings div.imagefile {
+    display: inline-block;
+    width: 23%;
+    padding-left: 1%;
+    padding-right: 1%;
+}
+
+.activity.activitystatus .modcontainer {
+    display: inline-block;
+    width: 31%;
+    padding-left: 1%;
+    padding-right: 1%;
+    vertical-align: text-top;
+    text-align: center;
+}
+
+.activity.activitystatus .modcontainer .modname {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings div.imagefile .fitemtitle {
+    display: block;
+    width: 100% !important;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings .felement.ffilemanager {
+    width: auto !important;
+    float: left !important;
+}
+
+.activitystatus.statusimage {
+    display: inline-block;
+    padding: 2% 1%;
+    text-align: center;
+}
+
+.activitystatus.statusimage img {
+    width: 70%;
+    object-fit: contain;
+}
+
+.activity.activitystatus {
+    margin: auto;
+}
+
+.activity.activitystatus .widgetcontents {
+    padding: 3% 0;
+}
+
+.activity.activitystatus .widgetcontainer {
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center;
+}   
+
+#page-mod-activitystatus-mod #fitem_id_default_status,
+#page-mod-activitystatus-mod #fitem_id_default_background {
+    padding-left: 2%;
+    padding-right: 2%;
+}
+
+#page-mod-activitystatus-mod fieldset#id_activitycompletionheader,
+#page-mod-activitystatus-mod fieldset#id_availabilityconditionsheader,
+#page-mod-activitystatus-mod fieldset#id_modstandardelshdr {
+    display: none;
+}
+
+@media (max-width: 480px) {
+    .activity.activitystatus .modname {
+        font-size: 60%;
+    }
+}
+
+@media (max-width: 767px) {
+    .activity.activitystatus .modname {
+        font-size: 80%;
+    }
+}
+
+@media (min-width: 980px) {
+    .activity.activitystatus .modname {
+        font-size: 100%;
+    }
+}

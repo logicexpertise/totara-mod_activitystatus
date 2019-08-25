@@ -173,8 +173,8 @@ function activitystatus_cm_info_view(cm_info $cm) {
                 }
             }
             $status = $completiontypes_mods[$key];
-            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'statusimages', $mod->id . $key, '', false)) {
-                $files = $fs->get_area_files($coursecontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
+            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'modstatusimages', $mod->id . $key, '', false)) {
+                $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', false, '', false);
             }
             if ($files) {
                 $file = array_shift($files);
@@ -193,8 +193,8 @@ function activitystatus_cm_info_view(cm_info $cm) {
             $completion = new completion_completion(array('userid' => $USER->id, 'course' => $course->id));
             $key = $completion->status ? $completion->status : COMPLETION_STATUS_NOTYETSTARTED;
             $status = $completiontypes_courses[$key];
-            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'statusimages', $course->id . $key, '', false)) {
-                $files = $fs->get_area_files($coursecontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
+            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, '', false)) {
+                $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
             }
             if ($files) {
                 $file = array_shift($files);

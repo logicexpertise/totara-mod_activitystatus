@@ -27,9 +27,9 @@ function activitystatus_set_image_files($data) {
         $tracked->courseormodid = $course->id;
         $tracked->type = 'course';
         foreach ($completiontypes_courses as $key => $type) {
-            $el = "imagefile_$course->id" . "_$key";
+            $el = "courseimagefile_$course->id" . "_$key";
             $tracked->$el = $data->$el;
-            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'statusimages', $course->id . $key, ['subdirs' => false]);
+            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, ['subdirs' => false]);
         }
     }
 
@@ -40,9 +40,9 @@ function activitystatus_set_image_files($data) {
         $tracked->courseormodid = $cm->id;
         $tracked->type = 'mod';
         foreach ($completiontypes_mods as $key => $type) {
-            $el = 'imagefile_' . $cm->id . '_' . $key;
+            $el = 'modimagefile_' . $cm->id . '_' . $key;
             $tracked->$el = $data->$el;
-            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'statusimages', $cm->id . $key, ['subdirs' => false]);
+            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'modstatusimages', $cm->id . $key, ['subdirs' => false]);
         }
     }
 }

@@ -40,12 +40,12 @@ class restore_activitystatus_activity_structure_step extends restore_activity_st
         // Add activitystatus related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_activitystatus', 'default_background', null);
         $this->add_related_files('mod_activitystatus', 'default_status', null);
-        $this->add_related_files('mod_activitystatus', 'statusimages', null);
+        $this->add_related_files('mod_activitystatus', 'modstatusimages', null);
+        $this->add_related_files('mod_activitystatus', 'coursestatusimages', null);
         
         $oldmodid = $this->task->get_old_activityid();
         $newmodid = $this->task->get_old_moduleid();
         
-        var_dump($oldmodid, $newmodid); die();
     }
 
 }

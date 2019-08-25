@@ -50,7 +50,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 // Add filemanager elements, one per image
                 foreach ($completiontypes_mods as $key => $type) {
                     $mform->addElement('html', html_writer::start_div('imagefile'));
-                    $mform->addElement('filemanager', 'imagefile_' . $cm->id . '_' . $key, get_string('completionimagemod', 'mod_activitystatus', $type), null, $filemanageroptions);
+                    $mform->addElement('filemanager', 'modimagefile_' . $cm->id . '_' . $key, get_string('completionimagemod', 'mod_activitystatus', $type), null, $filemanageroptions);
                     $mform->addElement('html', html_writer::end_div());
                 }
                 $mform->addElement('html', html_writer::end_div());
@@ -70,7 +70,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 $mform->addElement('html', html_writer::div($course->fullname, 'modname'));
                 foreach ($completiontypes_courses as $key => $type) {
                     $mform->addElement('html', html_writer::start_div('imagefile'));
-                    $mform->addElement('filemanager', 'imagefile_' . $course->id . '_' . $key, get_string('completionimagecourse', 'mod_activitystatus', $type), null, $filemanageroptions);
+                    $mform->addElement('filemanager', 'courseimagefile_' . $course->id . '_' . $key, get_string('completionimagecourse', 'mod_activitystatus', $type), null, $filemanageroptions);
                      $mform->addElement('html', html_writer::end_div());
                 }
                 $mform->addElement('html', html_writer::end_div());
@@ -110,9 +110,9 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 $completiontypes_mods = activitystatus_get_completion_types_mods();
                 foreach ($trackedmodules as $cm) {
                     foreach ($completiontypes_mods as $key => $type) {
-                        $el = 'imagefile_' . $cm->id . '_' . $key;
+                        $el = 'modimagefile_' . $cm->id . '_' . $key;
                         $draftitemid = file_get_submitted_draft_itemid($el);
-                        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'statusimages', $cm->id . $key, ['subdirs' => false]);
+                        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'modstatusimages', $cm->id . $key, ['subdirs' => false]);
                         $default_values[$el] = $draftitemid;
                     }
                 }
@@ -123,9 +123,9 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 $completiontypes_courses = activitystatus_get_completion_types_courses();
                 foreach ($linkedcourses as $course) {
                     foreach ($completiontypes_courses as $key => $type) {
-                        $el = 'imagefile_' . $course->id . '_' . $key;
+                        $el = 'courseimagefile_' . $course->id . '_' . $key;
                         $draftitemid = file_get_submitted_draft_itemid($el);
-                        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'statusimages', $course->id . $key, ['subdirs' => false]);
+                        file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, ['subdirs' => false]);
                         $default_values[$el] = $draftitemid;
                     }
                 }

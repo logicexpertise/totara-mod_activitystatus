@@ -23,7 +23,9 @@ class backup_activitystatus_activity_structure_step extends backup_activity_stru
         // Define each element separated
         $activitystatus = new backup_nested_element(
                 'activitystatus',
-                ['id'],
+                [
+            'id',
+                ],
                 [
             'course',
             'name',
@@ -32,16 +34,14 @@ class backup_activitystatus_activity_structure_step extends backup_activity_stru
             'timemodified',
                 ]
         );
-        
-        // Build the tree
-        
+
         // Define sources
         $activitystatus->set_source_table('activitystatus', array('id' => backup::VAR_ACTIVITYID));
-        // Define id annotations
         // Define file annotations
         $activitystatus->annotate_files('mod_activitystatus', 'default_background', null);
         $activitystatus->annotate_files('mod_activitystatus', 'default_status', null);
-        $activitystatus->annotate_files('mod_activitystatus', 'statusimages', null, $this->get_task()->get_contextid());
+        $activitystatus->annotate_files('mod_activitystatus', 'modstatusimages', null, $this->get_task()->get_contextid());
+        $activitystatus->annotate_files('mod_activitystatus', 'coursestatusimages', null, $this->get_task()->get_contextid());
         // Return the root element (activitystatus), wrapped into standard activity structure
         return $this->prepare_activity_structure($activitystatus);
     }

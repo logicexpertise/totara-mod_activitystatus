@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/activitystatus/db" VERSION="20190516" COMMENT="XMLDB file for Moodle mod/activitystatus"
+<XMLDB PATH="mod/activitystatus/db" VERSION="20200104" COMMENT="XMLDB file for Moodle mod/activitystatus"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -16,6 +16,22 @@
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
       </KEYS>
+    </TABLE>
+    <TABLE NAME="activitystatus_displayorder" COMMENT="Information on the order in which to display icons for linked activities and courses">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="modid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This module's ID - linked to course_modules table"/>
+        <FIELD NAME="modinstanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="This modules instance ID - useful for DB queries"/>
+        <FIELD NAME="courseormodid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="ID of linked course or module"/>
+        <FIELD NAME="itemtype" TYPE="char" LENGTH="100" NOTNULL="true" SEQUENCE="false" COMMENT="course or module"/>
+        <FIELD NAME="displayorder" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="activitystatus_displayorder_modid_idx" UNIQUE="false" FIELDS="modid"/>
+      </INDEXES>
     </TABLE>
   </TABLES>
 </XMLDB>

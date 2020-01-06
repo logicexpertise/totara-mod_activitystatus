@@ -17,9 +17,8 @@ require_once($CFG->dirroot . '/mod/activitystatus/locallib.php');
 class mod_activitystatus_mod_form extends moodleform_mod {
 
     public function definition() {
-        global $CFG, $COURSE;
+        global $CFG, $COURSE, $PAGE;
 
-        $settingsurl = '/mod/activitystatus/statusimagesettings.php';
         $mform = $this->_form;
 
         $filemanageroptions = [
@@ -37,7 +36,9 @@ class mod_activitystatus_mod_form extends moodleform_mod {
         $mform->addElement('filemanager', 'default_status', get_string('defaultstatusimage', 'mod_activitystatus'), null, $filemanageroptions);
 
         $mform->addElement('html', html_writer::start_div('statusimagesettings'));
-        $trackedmodules = activitystatus_get_tracked_coursemodules($COURSE);
+        $trackedmodules = activitystatus_get_tracked_coursemodules($this->current);
+        $linkedcourses = activitystatus_get_linked_courses($this->current);
+        $displayorderoptions = range(0, count($trackedmodules) + count($linkedcourses));
         if (!empty($trackedmodules)) {
             $mform->addElement('html', html_writer::start_div('modsheader'));
             $mform->addElement('static', 'modulesactivities', get_string('coursemodules', 'mod_activitystatus'));
@@ -53,12 +54,14 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                     $mform->addElement('filemanager', 'modimagefile_' . $cm->id . '_' . $key, get_string('completionimagemod', 'mod_activitystatus', $type), null, $filemanageroptions);
                     $mform->addElement('html', html_writer::end_div());
                 }
+                $mform->addElement('html', html_writer::start_div('displayorder', ['name' => 'displayorder']));
+                $mform->addElement('select', 'displayorder_mod_' . $cm->id, get_string('displayorder', 'mod_activitystatus'), $displayorderoptions);
+                $mform->addElement('html', html_writer::end_div());
                 $mform->addElement('html', html_writer::end_div());
             }
             $mform->addElement('html', html_writer::end_div());
         }
 
-        $linkedcourses = activitystatus_get_linked_courses($COURSE);
         if (!empty($linkedcourses)) {
             $mform->addElement('html', html_writer::start_div('modsheader'));
             $mform->addElement('static', 'linkedcourses', get_string('linkedcourses', 'mod_activitystatus'));
@@ -71,8 +74,11 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 foreach ($completiontypes_courses as $key => $type) {
                     $mform->addElement('html', html_writer::start_div('imagefile'));
                     $mform->addElement('filemanager', 'courseimagefile_' . $course->id . '_' . $key, get_string('completionimagecourse', 'mod_activitystatus', $type), null, $filemanageroptions);
-                     $mform->addElement('html', html_writer::end_div());
+                    $mform->addElement('html', html_writer::end_div());
                 }
+                $mform->addElement('html', html_writer::start_div('displayorder', ['name' => 'displayorder']));
+                $mform->addElement('select', 'displayorder_course_' . $course->id, get_string('displayorder', 'mod_activitystatus'), $displayorderoptions);
+                $mform->addElement('html', html_writer::end_div());
                 $mform->addElement('html', html_writer::end_div());
             }
             $mform->addElement('html', html_writer::end_div());
@@ -95,7 +101,9 @@ class mod_activitystatus_mod_form extends moodleform_mod {
     }
 
     public function data_preprocessing(&$default_values) {
-        global $COURSE;
+        global $COURSE, $DB;
+        parent::data_preprocessing($default_values);
+        $mform = $this->_form;
         // Editing current instance - copy existing files into draft area
         if ($this->current->instance) {
             $elements = activitystatus_background_elements();
@@ -105,7 +113,9 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 $default_values[$el] = $draftitemid;
             }
 
-            $trackedmodules = activitystatus_get_tracked_coursemodules($COURSE);
+            $displayorder = activitystatus_load_displayorder($this->_cm);
+
+            $trackedmodules = activitystatus_get_tracked_coursemodules($this->current);
             if (!empty($trackedmodules)) {
                 $completiontypes_mods = activitystatus_get_completion_types_mods();
                 foreach ($trackedmodules as $cm) {
@@ -115,10 +125,12 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'modstatusimages', $cm->id . $key, ['subdirs' => false]);
                         $default_values[$el] = $draftitemid;
                     }
+                    $pos = activitystatus_get_displayorder($displayorder, 'mod', $cm->id);
+                    $default_values['displayorder_mod_' . $cm->id] = !empty($pos) ? $pos : 0;
                 }
             }
 
-            $linkedcourses = activitystatus_get_linked_courses($COURSE);
+            $linkedcourses = activitystatus_get_linked_courses($this->current);
             if (!empty($linkedcourses)) {
                 $completiontypes_courses = activitystatus_get_completion_types_courses();
                 foreach ($linkedcourses as $course) {
@@ -128,6 +140,8 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                         file_prepare_draft_area($draftitemid, $this->context->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, ['subdirs' => false]);
                         $default_values[$el] = $draftitemid;
                     }
+                    $pos = activitystatus_get_displayorder($displayorder, 'course', $course->id);
+                    $default_values['displayorder_course_' . $course->id] = !empty($pos) ? $pos : 0;
                 }
             }
         }

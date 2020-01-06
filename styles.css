@@ -4,6 +4,10 @@
     border-bottom: 1px solid #BFBFBF;
 }
 
+#page-mod-activitystatus-mod .statusimagesettings .modinfo {
+    position: relative;
+}
+
 #page-mod-activitystatus-mod .statusimagesettings .mods {
     margin-top: 10px;
 }
@@ -15,9 +19,27 @@
 
 #page-mod-activitystatus-mod .statusimagesettings div.imagefile {
     display: inline-block;
-    width: 23%;
+    width: 21%;
     padding-left: 1%;
     padding-right: 1%;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings div.displayorder {
+    display: inline-block;
+    width: 8%;
+    padding-left: 0%;
+    padding-right: 1%;
+    position: absolute;
+    top: 50%;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings div.displayorder .fselect {
+    float: left;
+}
+
+#page-mod-activitystatus-mod .statusimagesettings div.displayorder .fitemtitle {
+    display: block;
+    width: 100% !important;
 }
 
 .activity.activitystatus .modcontainer {

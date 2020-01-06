@@ -25,3 +25,4 @@ $string['statusimagealt'] = 'Completion status: {$a}';
 $string['statusimagesettings'] = 'Image settings';
 $string['activitystatus:addinstance'] = 'Add Activity status resource to dashboard';
 $string['activitystatus:view'] = 'View Activity status';
+$string['displayorder'] = 'Display order';

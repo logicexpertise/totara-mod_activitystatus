@@ -31,6 +31,8 @@ function activitystatus_supports($feature) {
  */
 function activitystatus_add_instance($data, $mform) {
     global $DB;
+    $course = new stdClass();
+    $course->id = $data->course;
 
     $cmid = $data->coursemodule;
     $data->name = get_string('activitystatustitle', 'mod_activitystatus');
@@ -39,30 +41,40 @@ function activitystatus_add_instance($data, $mform) {
     // we need to use context now, so we need to make sure all needed info is already in db
     $DB->set_field('course_modules', 'instance', $data->id, ['id' => $cmid]);
     activitystatus_set_image_files($data);
+    activitystatus_save_displayorder($data, activitystatus_get_tracked_coursemodules($data), 'mod');
+    activitystatus_save_displayorder($data, activitystatus_get_linked_courses($data), 'course');
     return $data->id;
 }
 
 function activitystatus_update_instance($data, $mform) {
     global $DB;
+
+    $course = new stdClass();
+    $course->id = $data->course;
+
     $cmid = $data->coursemodule;
     $data->id = $data->instance;
     $data->timemodified = time();
     $DB->update_record('activitystatus', $data);
-    $context = context_module::instance($cmid);
     activitystatus_set_image_files($data);
+    activitystatus_save_displayorder($data, activitystatus_get_tracked_coursemodules($data), 'mod');
+    activitystatus_save_displayorder($data, activitystatus_get_linked_courses($data), 'course');
     return true;
 }
 
 function activitystatus_delete_instance($id) {
     global $DB;
 
-    if (!$widget = $DB->get_record('activitystatus', array('id' => $id))) {
+    $widget = $DB->get_record('activitystatus', array('id' => $id));
+    $displayorder = $DB->get_records('activitystatus_displayorder', ['modid' => $id]);
+    if (!$widget && !$displayorder) {
         return false;
     }
 
-    $result = $DB->delete_records('activitystatus', array('id' => $widget->id));
+    $deletewidget = $DB->delete_records('activitystatus', array('id' => $widget->id));
+    $deletedisplayorder = $DB->delete_records('activitystatus_displayorder', ['modid' => $id]);
 
-    return $result;
+    return ($deletewidget && $deletedisplayorder);
 }
 
 /**
@@ -140,6 +152,8 @@ function activitystatus_cm_info_view(cm_info $cm) {
     if ($completioninfo->is_tracked_user($USER->id) || $can_edit) {
         $fs = get_file_storage();
         require_once($CFG->dirroot . '/mod/activitystatus/locallib.php');
+        $completiontypes_mods = activitystatus_get_completion_types_mods();
+        $completiontypes_courses = activitystatus_get_completion_types_courses();
         $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_background', 0, '', false);
         if ($files) {
             $file = array_shift($files);
@@ -147,65 +161,78 @@ function activitystatus_cm_info_view(cm_info $cm) {
         } else {
             $backgroundimageurl = '';
         }
+
+        $trackedmodules = activitystatus_get_tracked_coursemodules($cm);
+        $linkedcourses = activitystatus_get_linked_courses($cm);
+        $linked = array_merge($trackedmodules, $linkedcourses);
+
+        $displayorder = activitystatus_load_displayorder($cm);
+        $iconsorder = activitystatus_icons_order($displayorder, 'mod');
+
+        if (empty($iconsorder)) { // Previously existing widget.
+            foreach ($linked as $l) {
+                $iconsorder[$l->id] = 0;
+            }
+        }
+        
         $content .= html_writer::start_div('widgetcontainer', ['style' => 'background-image: url(' . $backgroundimageurl . ');']);
         $content .= html_writer::start_div('widgetcontents');
-        $completiontypes_mods = activitystatus_get_completion_types_mods();
-        $trackedmodules = activitystatus_get_tracked_coursemodules($course);
-        foreach ($trackedmodules as $mod) {
-            if (empty($mod->available)) {
-                $key = 3;
-            } else {
-                $completiondata = $completioninfo->get_data($mod, true, $USER->id);
-                $state = $completiondata->completionstate;
-                switch ($state) {
-                    case COMPLETION_INCOMPLETE:
-                        $key = 0;
-                        break;
-                    case COMPLETION_COMPLETE:
-                    case COMPLETION_COMPLETE_PASS:
-                    case COMPLETION_COMPLETE_RPL:
-                        $key = 1;
-                        break;
-                    case COMPLETION_COMPLETE_FAIL:
-                        $key = 2;
-                        break;
-                    default;
+        foreach ($iconsorder as $key => $order) {
+            $item = activitystatus_get_courseormodule_with_id($linked, $key);
+            if (isset($item->module)) {
+                $mod = $item;
+                if (empty($mod->available)) {
+                    $key = 3;
+                } else {
+                    $completiondata = $completioninfo->get_data($mod, true, $USER->id);
+                    $state = $completiondata->completionstate;
+                    switch ($state) {
+                        case COMPLETION_INCOMPLETE:
+                            $key = 0;
+                            break;
+                        case COMPLETION_COMPLETE:
+                        case COMPLETION_COMPLETE_PASS:
+                        case COMPLETION_COMPLETE_RPL:
+                            $key = 1;
+                            break;
+                        case COMPLETION_COMPLETE_FAIL:
+                            $key = 2;
+                            break;
+                        default;
+                    }
                 }
-            }
-            $status = $completiontypes_mods[$key];
-            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'modstatusimages', $mod->id . $key, '', false)) {
-                $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', false, '', false);
-            }
-            if ($files) {
-                $file = array_shift($files);
-                $statusimageurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                $status = $completiontypes_mods[$key];
+                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'modstatusimages', $mod->id . $key, '', false)) {
+                    $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', false, '', false);
+                }
+                if ($files) {
+                    $file = array_shift($files);
+                    $statusimageurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                } else {
+                    $statusimageurl = new moodle_url('/mod/activitystatus/pix/status.png');
+                }
+                $content .= html_writer::start_div('modcontainer');
+                $content .= html_writer::link($mod->url, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
+                $content .= html_writer::end_div();
             } else {
-                $statusimageurl = new moodle_url('/mod/activitystatus/pix/status.png');
+                $course = $item;
+                $completion = new completion_completion(array('userid' => $USER->id, 'course' => $course->id));
+                $key = $completion->status ? $completion->status : COMPLETION_STATUS_NOTYETSTARTED;
+                $status = $completiontypes_courses[$key];
+                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, '', false)) {
+                    $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
+                }
+                if ($files) {
+                    $file = array_shift($files);
+                    $statusimageurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
+                } else {
+                    $statusimageurl = new moodle_url('/mod/activitystatus/pix/status.png');
+                }
+                $content .= html_writer::start_div('modcontainer');
+                $courseurl = new moodle_url('/course/view.php', ['id' => $course->id]);
+                $content .= html_writer::link($courseurl, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
+                $content .= html_writer::end_div();
             }
-            $content .= html_writer::start_div('modcontainer');
-            $content .= html_writer::link($mod->url, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
-            $content .= html_writer::end_div();
-        }
-
-        $completiontypes_courses = activitystatus_get_completion_types_courses();
-        $linkedcourses = activitystatus_get_linked_courses($course);
-        foreach ($linkedcourses as $course) {
-            $completion = new completion_completion(array('userid' => $USER->id, 'course' => $course->id));
-            $key = $completion->status ? $completion->status : COMPLETION_STATUS_NOTYETSTARTED;
-            $status = $completiontypes_courses[$key];
-            if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, '', false)) {
-                $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
-            }
-            if ($files) {
-                $file = array_shift($files);
-                $statusimageurl = moodle_url::make_pluginfile_url($file->get_contextid(), $file->get_component(), $file->get_filearea(), $file->get_itemid(), $file->get_filepath(), $file->get_filename());
-            } else {
-                $statusimageurl = new moodle_url('/mod/activitystatus/pix/status.png');
-            }
-            $content .= html_writer::start_div('modcontainer');
-            $courseurl = new moodle_url('/course/view.php', ['id' => $course->id]);
-            $content .= html_writer::link($courseurl, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
-            $content .= html_writer::end_div();
         }
         $content .= html_writer::end_div();
         $content .= html_writer::end_div();

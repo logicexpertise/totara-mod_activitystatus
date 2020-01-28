@@ -27,9 +27,9 @@ function activitystatus_set_image_files($data) {
         $tracked->courseormodid = $linkedcourse->id;
         $tracked->type = 'course';
         foreach ($completiontypes_courses as $key => $type) {
-            $el = "courseimagefile_$linkedcourse->id" . "_$key";
+            $el = "imagefile_$linkedcourse->id" . "_$key";
             $tracked->$el = $data->$el;
-            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'coursestatusimages', $linkedcourse->id . $key, ['subdirs' => false]);
+            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'statusimages', $linkedcourse->id . $key, ['subdirs' => false]);
         }
     }
 
@@ -40,9 +40,9 @@ function activitystatus_set_image_files($data) {
         $tracked->courseormodid = $cm->id;
         $tracked->type = 'mod';
         foreach ($completiontypes_mods as $key => $type) {
-            $el = 'modimagefile_' . $cm->id . '_' . $key;
+            $el = 'imagefile_' . $cm->id . '_' . $key;
             $tracked->$el = $data->$el;
-            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'modstatusimages', $cm->id . $key, ['subdirs' => false]);
+            file_save_draft_area_files($data->$el, $modcontext->id, 'mod_activitystatus', 'statusimages', $cm->id . $key, ['subdirs' => false]);
         }
     }
 }
@@ -142,19 +142,27 @@ function activitystatus_get_displayorder($array, $type, $id) {
 }
 
 function activitystatus_icons_order($displayorder) {
-    $order = array_column(
-            json_decode(
-                    json_encode($displayorder), true
-            ), 'displayorder', 'courseormodid'
-    );
-    // Sort if non-zero positions
-    if (!empty(array_filter($order))) {
-        asort($order);
+    usort($displayorder, function($a, $b) {
+        if ((int) $a->displayorder == (int) $b->displayorder) {
+            return 0;
+        } else if ((int) $a->displayorder < (int) $b->displayorder) {
+            return -1;
+        } else {
+            return 1;
+        }
     }
-    return $order;
+    );
+    return $displayorder;
 }
 
-function activitystatus_get_courseormodule_with_id($objects, $id) {
+function activitystatus_get_module_with_id($objects, $id) {
+    $item = array_filter($objects, function($e) use ($id) {
+        return $e->id == $id;
+    }); // Array containing 1 object
+    return array_shift($item);
+}
+
+function activitystatus_get_course_with_id($objects, $id) {
     $item = array_filter($objects, function($e) use ($id) {
         return $e->id == $id;
     }); // Array containing 1 object

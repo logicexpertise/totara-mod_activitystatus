@@ -28,7 +28,7 @@ function xmldb_activitystatus_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2019051600, 'activitystatus');
     }
 
-    if ($oldversion < 2020010303) {
+    if ($oldversion < 2020010501) {
 
         // Define table activitystatus_displayorder to be created.
         $table = new xmldb_table('activitystatus_displayorder');
@@ -53,7 +53,7 @@ function xmldb_activitystatus_upgrade($oldversion) {
         }
 
         // Activitystatus savepoint reached.
-        upgrade_mod_savepoint(true, 2020010303, 'activitystatus');
+        upgrade_mod_savepoint(true, 2020010501, 'activitystatus');
     }
 
 

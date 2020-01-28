@@ -167,20 +167,28 @@ function activitystatus_cm_info_view(cm_info $cm) {
         $linked = array_merge($trackedmodules, $linkedcourses);
 
         $displayorder = activitystatus_load_displayorder($cm);
-        $iconsorder = activitystatus_icons_order($displayorder, 'mod');
-
+        $iconsorder = activitystatus_icons_order($displayorder);
         if (empty($iconsorder)) { // Previously existing widget.
             foreach ($linked as $l) {
-                $iconsorder[$l->id] = 0;
+                $record = new \stdClass();
+                $record->modid = $cm->id;
+                $record->modinstanceid = $cm->instance;
+                $record->courseormodid = $l->id;
+                if (isset($l->modname)) {
+                    $record->itemtype = 'mod';
+                } else if (isset($l->coursetype)) {
+                    $record->itemtype = 'course';
+                }
+                $record->displayorder = 0;
+                $iconsorder[] = $record;
             }
         }
-        
         $content .= html_writer::start_div('widgetcontainer', ['style' => 'background-image: url(' . $backgroundimageurl . ');']);
         $content .= html_writer::start_div('widgetcontents');
-        foreach ($iconsorder as $key => $order) {
-            $item = activitystatus_get_courseormodule_with_id($linked, $key);
-            if (isset($item->module)) {
-                $mod = $item;
+        foreach ($iconsorder as $order) {
+            $order->type = $order->itemtype;
+            if ($order->itemtype == 'mod') {
+                $mod = activitystatus_get_module_with_id($trackedmodules, $order->courseormodid);
                 if (empty($mod->available)) {
                     $key = 3;
                 } else {
@@ -202,7 +210,7 @@ function activitystatus_cm_info_view(cm_info $cm) {
                     }
                 }
                 $status = $completiontypes_mods[$key];
-                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'modstatusimages', $mod->id . $key, '', false)) {
+                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'statusimages', $mod->id . $key, '', false)) {
                     $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', false, '', false);
                 }
                 if ($files) {
@@ -214,12 +222,12 @@ function activitystatus_cm_info_view(cm_info $cm) {
                 $content .= html_writer::start_div('modcontainer');
                 $content .= html_writer::link($mod->url, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
                 $content .= html_writer::end_div();
-            } else {
-                $course = $item;
-                $completion = new completion_completion(array('userid' => $USER->id, 'course' => $course->id));
+            } else if ($order->itemtype == 'course') {
+
+                $completion = new completion_completion(array('userid' => $USER->id, 'course' => $order->courseormodid));
                 $key = $completion->status ? $completion->status : COMPLETION_STATUS_NOTYETSTARTED;
                 $status = $completiontypes_courses[$key];
-                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'coursestatusimages', $course->id . $key, '', false)) {
+                if (!$files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'statusimages', $order->courseormodid . $key, '', false)) {
                     $files = $fs->get_area_files($modcontext->id, 'mod_activitystatus', 'default_status', 0, '', false);
                 }
                 if ($files) {
@@ -229,11 +237,12 @@ function activitystatus_cm_info_view(cm_info $cm) {
                     $statusimageurl = new moodle_url('/mod/activitystatus/pix/status.png');
                 }
                 $content .= html_writer::start_div('modcontainer');
-                $courseurl = new moodle_url('/course/view.php', ['id' => $course->id]);
+                $courseurl = new moodle_url('/course/view.php', ['id' => $order->courseormodid]);
                 $content .= html_writer::link($courseurl, html_writer::div(html_writer::img($statusimageurl, get_string('statusimagealt', 'mod_activitystatus', $status)), 'activitystatus statusimage'));
                 $content .= html_writer::end_div();
             }
         }
+
         $content .= html_writer::end_div();
         $content .= html_writer::end_div();
     } else {

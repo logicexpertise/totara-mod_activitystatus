@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package     mod_activitystatus
@@ -174,7 +173,7 @@ function activitystatus_cm_info_view(cm_info $cm) {
                 $iconsorder[$l->id] = 0;
             }
         }
-        
+
         $content .= html_writer::start_div('widgetcontainer', ['style' => 'background-image: url(' . $backgroundimageurl . ');']);
         $content .= html_writer::start_div('widgetcontents');
         foreach ($iconsorder as $key => $order) {

@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package
@@ -26,7 +25,6 @@ class backup_activitystatus_activity_task extends backup_activity_task {
      */
     protected function define_my_steps() {
         $this->add_step(new backup_activitystatus_activity_structure_step('activitystatus_structure', 'activitystatus.xml'));
-        // Choice only has one structure step
     }
 
     /**

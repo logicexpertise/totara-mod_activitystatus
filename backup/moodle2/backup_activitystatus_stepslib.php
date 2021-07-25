@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package
@@ -22,17 +21,15 @@ class backup_activitystatus_activity_structure_step extends backup_activity_stru
 
         // Define each element separated
         $activitystatus = new backup_nested_element(
-                'activitystatus',
-                [
+                'activitystatus', [
             'id',
-                ],
-                [
+                ], [
             'course',
             'name',
             'intro',
             'introformat',
             'timemodified',
-                ]
+                ],
         );
 
         // Define sources

@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package
@@ -96,7 +95,7 @@ class restore_activitystatus_activity_task extends restore_activity_task {
 
         return $rules;
     }
-    
+
     /**
      * Getter for activitystatus plugins.
      *

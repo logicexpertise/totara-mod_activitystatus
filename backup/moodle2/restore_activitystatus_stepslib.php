@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package
@@ -19,7 +18,7 @@ class restore_activitystatus_activity_structure_step extends restore_activity_st
         $userinfo = $this->get_setting_value('userinfo');
         // Define each element separated.
         $paths[] = new restore_path_element('activitystatus', '/activity/activitystatus');
-        
+
         // Return the paths wrapped into standard activity structure
         return $this->prepare_activity_structure($paths);
     }
@@ -35,17 +34,16 @@ class restore_activitystatus_activity_structure_step extends restore_activity_st
         // immediately after inserting "activity" record, call this
         $this->apply_activity_instance($newitemid);
     }
-    
+
     protected function after_execute() {
         // Add activitystatus related files, no need to match by itemname (just internally handled context)
         $this->add_related_files('mod_activitystatus', 'default_background', null);
         $this->add_related_files('mod_activitystatus', 'default_status', null);
         $this->add_related_files('mod_activitystatus', 'modstatusimages', null);
         $this->add_related_files('mod_activitystatus', 'coursestatusimages', null);
-        
+
         $oldmodid = $this->task->get_old_activityid();
         $newmodid = $this->task->get_old_moduleid();
-        
     }
 
 }

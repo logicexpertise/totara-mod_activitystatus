@@ -1,5 +1,4 @@
 <?php
-
 /**
  *
  * @package
@@ -9,6 +8,14 @@
  * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 defined('MOODLE_INTERNAL') || die();
+
+/**
+ * Course completion status constants
+ */
+define('COMPLETION_STATUS_NOTYETSTARTED', 10);
+define('COMPLETION_STATUS_INPROGRESS', 25);
+define('COMPLETION_STATUS_COMPLETE', 50);
+define('COMPLETION_STATUS_COMPLETEVIARPL', 75);
 
 function activitystatus_set_image_files($data) {
     $course = new stdClass();

@@ -75,10 +75,11 @@ function activitystatus_get_linked_courses($data) {
 
 function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
     global $DB;
+    $modinstanceid = $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule]);
     foreach ($trackedmodsorcourses as $cm) {
         $params = [
             'modid' => $data->coursemodule,
-            'modinstanceid' => $data->instance,
+            'modinstanceid' => $modinstanceid ,
             'courseormodid' => $cm->id,
             'itemtype' => $type,
         ];
@@ -89,7 +90,7 @@ function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
             // Insert.
             $record = new \stdClass();
             $record->modid = $data->coursemodule;
-            $record->modinstanceid = $data->instance;
+            $record->modinstanceid = $modinstanceid;
             $record->courseormodid = $cm->id;
             $record->itemtype = $type;
             $record->displayorder = $data->{"displayorder_" . $type . "_$cm->id"};
@@ -100,7 +101,7 @@ function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
 
 function activitystatus_load_displayorder($cm_data) {
     global $DB;
-    return $DB->get_records('activitystatus_displayorder', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
+    return $DB->get_records_sql('select * from {activitystatus_displayorder} where modid = :modid and modinstanceid = :modinstanceid and displayorder > 0', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
 }
 
 function activitystatus_get_completion_types_mods() {

@@ -26,3 +26,4 @@ $string['statusimagesettings'] = 'Image settings';
 $string['activitystatus:addinstance'] = 'Add Activity status resource to dashboard';
 $string['activitystatus:view'] = 'View Activity status';
 $string['displayorder'] = 'Display order';
+$string['displayorder_help'] = 'Override the order in which the activities are displayed. A display order of 0 means this activity will not be displayed.';

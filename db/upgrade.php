@@ -56,6 +56,14 @@ function xmldb_activitystatus_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2020010501, 'activitystatus');
     }
 
+    if ($oldversion < 2021080400) {
+
+        // Now using displayorder 0 to mean do not display.
+        // Increment all existing displayorders
+        $DB->execute('update {activitystatus_displayorder} set displayorder = displayorder + 1');
+
+        upgrade_mod_savepoint(true, 2021080400, 'activitystatus');
+    }
 
     return true;
 }

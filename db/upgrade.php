@@ -57,12 +57,25 @@ function xmldb_activitystatus_upgrade($oldversion) {
     }
 
     if ($oldversion < 2021080400) {
-
         // Now using displayorder 0 to mean do not display.
         // Increment all existing displayorders
         $DB->execute('update {activitystatus_displayorder} set displayorder = displayorder + 1');
 
         upgrade_mod_savepoint(true, 2021080400, 'activitystatus');
+    }
+
+    if ($oldversion < 2021080500) {
+
+        // Remove any orpahaned records
+        $rs = $DB->get_recordset_sql("select o.id from {activitystatus_displayorder} o left join {course_modules} cm on cm.id = o.modid where o.itemtype = 'mod' and cm.id is null");
+        foreach ($rs as $record) {
+          $DB->delete_records('activitystatus_displayorder', ['id' => $record->id]);
+        }
+
+        // Properly set any modinstanceid where modinstanceid is 1
+        $DB->execute("update {activitystatus_displayorder} set modinstanceid = (select instance from {course_modules} where id = modid) where modinstanceid = 0 and itemtype = 'mod'");
+
+        upgrade_mod_savepoint(true, 2021080401, 'activitystatus');
     }
 
     return true;

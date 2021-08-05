@@ -10,6 +10,6 @@
  */
 
 $plugin->component = 'mod_activitystatus';
-$plugin->version = 2021080400;
+$plugin->version = 2021080500;
 $plugin->requires = 2015051107;
 $plugin->maturity = MATURITY_RC;

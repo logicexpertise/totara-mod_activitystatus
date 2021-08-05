@@ -107,7 +107,7 @@ function activitystatus_get_coursemodule_info($cm) {
 
 /**
  * @todo this needs serious cleaning up!
- * 
+ *
  * @global type $CFG
  * @global type $PAGE
  * @global type $USER

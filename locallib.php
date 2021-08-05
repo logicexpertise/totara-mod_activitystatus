@@ -79,10 +79,17 @@ function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
     foreach ($trackedmodsorcourses as $cm) {
         $params = [
             'modid' => $data->coursemodule,
-            'modinstanceid' => $modinstanceid ,
+            'modinstanceid' => $type === 'mod'
+                ? $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule])
+                : $cm->id, //$data->instance,
             'courseormodid' => $cm->id,
             'itemtype' => $type,
         ];
+        // if ($type === 'mod' && !is_int($params->modinstanceid)) {
+        //     $params->modinstanceid = $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule]);
+        // } else if ($type === 'course' && !is_int($params->modinstanceid)) {
+        //     $params->modinstanceid = 0;
+        // }
         if (false !== $pos = $DB->get_field('activitystatus_displayorder', 'displayorder', $params)) {
             // Update.
             $DB->set_field('activitystatus_displayorder', 'displayorder', $data->{"displayorder_" . $type . "_$cm->id"}, $params);
@@ -101,7 +108,9 @@ function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
 
 function activitystatus_load_displayorder($cm_data) {
     global $DB;
-    return $DB->get_records_sql('select * from {activitystatus_displayorder} where modid = :modid and modinstanceid = :modinstanceid and displayorder > 0', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
+
+    $concatsql = $DB->sql_concat('courseormodid', '\'_\'', 'itemtype');
+    return $DB->get_records_sql('select id, displayorder, ' . $concatsql . ' "courseormodid" from {activitystatus_displayorder} where modid = :modid and modinstanceid = :modinstanceid and displayorder > 0', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
 }
 
 function activitystatus_get_completion_types_mods() {
@@ -156,8 +165,15 @@ function activitystatus_icons_order($displayorder) {
 }
 
 function activitystatus_get_courseormodule_with_id($objects, $id) {
-    $item = array_filter($objects, function($e) use ($id) {
-        return $e->id == $id;
+    $parts = explode('_', $id);
+    $id = $parts[0];
+    $type = $parts[1];
+    $item = array_filter($objects, function($e) use ($id, $type) {
+        if ($type === 'course') {
+            return $e->id == $id && isset($e->category);
+        } else {
+            return $e->id == $id;
+        }
     }); // Array containing 1 object
     return array_shift($item);
 }

@@ -110,7 +110,7 @@ function activitystatus_load_displayorder($cm_data) {
     global $DB;
 
     $concatsql = $DB->sql_concat('courseormodid', '\'_\'', 'itemtype');
-    return $DB->get_records_sql('select id, displayorder, ' . $concatsql . ' "courseormodid" from {activitystatus_displayorder} where modid = :modid and modinstanceid = :modinstanceid and displayorder > 0', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
+    return $DB->get_records_sql('select id, displayorder, itemtype, ' . $concatsql . ' "courseormodid" from {activitystatus_displayorder} where modid = :modid and modinstanceid = :modinstanceid', ['modid' => $cm_data->id, 'modinstanceid' => $cm_data->instance]);
 }
 
 function activitystatus_get_completion_types_mods() {
@@ -144,7 +144,7 @@ function activitystatus_background_elements() {
 
 function activitystatus_get_displayorder($array, $type, $id) {
     foreach ($array as $item) {
-        if ($item->itemtype == $type && $item->courseormodid == $id) {
+        if ($item->itemtype == $type && explode('_', $item->courseormodid)[0] == $id) {
             return $item->displayorder;
         }
     }

@@ -179,7 +179,7 @@ function activitystatus_cm_info_view(cm_info $cm) {
         $content .= html_writer::start_div('widgetcontents');
         foreach ($iconsorder as $key => $order) {
             $item = activitystatus_get_courseormodule_with_id($linked, $key);
-            if (isset($item->module)) {
+            if ($order > 0 && isset($item->module)) {
                 $mod = $item;
                 if (empty($mod->available)) {
                     $key = 3;

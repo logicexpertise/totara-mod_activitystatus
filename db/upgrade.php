@@ -75,7 +75,7 @@ function xmldb_activitystatus_upgrade($oldversion) {
         // Properly set any modinstanceid where modinstanceid is 1
         $DB->execute("update {activitystatus_displayorder} set modinstanceid = (select instance from {course_modules} where id = modid) where modinstanceid = 0 and itemtype = 'mod'");
 
-        upgrade_mod_savepoint(true, 2021080401, 'activitystatus');
+        upgrade_mod_savepoint(true, 2021080500, 'activitystatus');
     }
 
     return true;

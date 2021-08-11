@@ -130,7 +130,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                         $default_values[$el] = $draftitemid;
                     }
                     $pos = activitystatus_get_displayorder($displayorder, 'mod', $cm->id);
-                    $default_values['displayorder_mod_' . $cm->id] = !empty($pos) ? $pos : 0;
+                    $default_values['displayorder_mod_' . $cm->id] = isset($pos) ? $pos : 1;
                 }
             }
 
@@ -145,7 +145,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                         $default_values[$el] = $draftitemid;
                     }
                     $pos = activitystatus_get_displayorder($displayorder, 'course', $course->id);
-                    $default_values['displayorder_course_' . $course->id] = !empty($pos) ? $pos : 0;
+                    $default_values['displayorder_course_' . $course->id] = isset($pos) ? $pos : 1;
                 }
             }
         }

@@ -79,18 +79,11 @@ function activitystatus_save_displayorder($data, $trackedmodsorcourses, $type) {
     foreach ($trackedmodsorcourses as $cm) {
         $params = [
             'modid' => $data->coursemodule,
-            'modinstanceid' => $type === 'mod'
-                ? $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule])
-                : $cm->id, //$data->instance,
+            'modinstanceid' => $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule]),
             'courseormodid' => $cm->id,
             'itemtype' => $type,
         ];
-        // if ($type === 'mod' && !is_int($params->modinstanceid)) {
-        //     $params->modinstanceid = $DB->get_field('course_modules', 'instance', ['id' => $data->coursemodule]);
-        // } else if ($type === 'course' && !is_int($params->modinstanceid)) {
-        //     $params->modinstanceid = 0;
-        // }
-        if (false !== $pos = $DB->get_field('activitystatus_displayorder', 'displayorder', $params)) {
+        if ($DB->record_exists('activitystatus_displayorder', $params)) {
             // Update.
             $DB->set_field('activitystatus_displayorder', 'displayorder', $data->{"displayorder_" . $type . "_$cm->id"}, $params);
         } else {

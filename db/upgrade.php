@@ -78,5 +78,17 @@ function xmldb_activitystatus_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021080500, 'activitystatus');
     }
 
+    if ($oldversion < 2021101200) {
+        $concatsql = $DB->sql_concat('modid', 'itemtype', 'courseormodid');
+        $duplicates = $DB->get_records_sql('select ' . $concatsql . ' "id", modid, modinstanceid, courseormodid, itemtype, count(id) "count" from {activitystatus_displayorder} group by modid, modinstanceid, courseormodid, itemtype');
+        foreach ($duplicates as $item) {
+          if ($item->count > 1) {
+            $DB->delete_records('activitystatus_displayorder', ['modid'=>$item->modid, 'modinstanceid'=>$item->modinstanceid, 'itemtype'=>$item->itemtype]);
+          }
+        }
+
+        upgrade_mod_savepoint(true, 2021081200, 'activitystatus');
+    }
+
     return true;
 }

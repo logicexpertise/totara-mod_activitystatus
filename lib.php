@@ -174,12 +174,14 @@ function activitystatus_cm_info_view(cm_info $cm) {
                 $iconsorder[$l->id] = 0;
             }
         }
-
         $content .= html_writer::start_div('widgetcontainer', ['style' => 'background-image: url(' . $backgroundimageurl . ');']);
         $content .= html_writer::start_div('widgetcontents');
         foreach ($iconsorder as $key => $order) {
+            if ($order < 1) {
+              continue;
+            }
             $item = activitystatus_get_courseormodule_with_id($linked, $key);
-            if ($order > 0 && isset($item->module)) {
+            if (isset($item->module)) {
                 $mod = $item;
                 if (empty($mod->available)) {
                     $key = 3;

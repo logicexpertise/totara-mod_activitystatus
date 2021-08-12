@@ -78,7 +78,16 @@ function xmldb_activitystatus_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2021080500, 'activitystatus');
     }
 
-    if ($oldversion < 2021101200) {
+    if ($oldversion < 2021081300) {
+        $rs = $DB->get_recordset('activitystatus_displayorder', ['modinstanceid'=>'0', 'itemtype'=>'course']);
+        foreach ($rs as $rec) {
+            $instance = $DB->get_record('course_modules', ['id'=>$rec->modid]);
+            if ($instance) {
+              $rec->modinstanceid = $instance->instance;
+              $DB->update_record('activitystatus_displayorder', $rec);
+            }
+        }
+
         $concatsql = $DB->sql_concat('modid', 'itemtype', 'courseormodid');
         $duplicates = $DB->get_records_sql('select ' . $concatsql . ' "id", modid, modinstanceid, courseormodid, itemtype, count(id) "count" from {activitystatus_displayorder} group by modid, modinstanceid, courseormodid, itemtype');
         foreach ($duplicates as $item) {
@@ -87,7 +96,7 @@ function xmldb_activitystatus_upgrade($oldversion) {
           }
         }
 
-        upgrade_mod_savepoint(true, 2021081200, 'activitystatus');
+        upgrade_mod_savepoint(true, 2021081300, 'activitystatus');
     }
 
     return true;

@@ -38,7 +38,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
         $mform->addElement('html', html_writer::start_div('statusimagesettings'));
         $trackedmodules = activitystatus_get_tracked_coursemodules($this->current);
         $linkedcourses = activitystatus_get_linked_courses($this->current);
-        $displayorderoptions = range(0, count($trackedmodules) + count($linkedcourses));
+        $displayorderoptions = range(0, count($trackedmodules) + count($linkedcourses) + 1);
         if (!empty($trackedmodules)) {
             $mform->addElement('html', html_writer::start_div('modsheader'));
             $mform->addElement('static', 'modulesactivities', get_string('coursemodules', 'mod_activitystatus'));

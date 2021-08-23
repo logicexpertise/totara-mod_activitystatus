@@ -141,7 +141,7 @@ function activitystatus_get_displayorder($array, $type, $id) {
             return $item->displayorder;
         }
     }
-    return 0;
+    return 1;
 }
 
 function activitystatus_icons_order($displayorder) {
@@ -160,7 +160,7 @@ function activitystatus_icons_order($displayorder) {
 function activitystatus_get_courseormodule_with_id($objects, $id) {
     $parts = explode('_', $id);
     $id = $parts[0];
-    $type = $parts[1];
+    $type = count($parts) == 2 ? $parts[1] : null;
     $item = array_filter($objects, function($e) use ($id, $type) {
         if ($type === 'course') {
             return $e->id == $id && isset($e->category);

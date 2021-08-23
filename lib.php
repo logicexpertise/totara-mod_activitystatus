@@ -171,7 +171,7 @@ function activitystatus_cm_info_view(cm_info $cm) {
 
         if (empty($iconsorder)) { // Previously existing widget.
             foreach ($linked as $l) {
-                $iconsorder[$l->id] = 0;
+                $iconsorder[$l->id] = 1; // Updated
             }
         }
         $content .= html_writer::start_div('widgetcontainer', ['style' => 'background-image: url(' . $backgroundimageurl . ');']);

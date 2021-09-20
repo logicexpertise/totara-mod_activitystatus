@@ -56,7 +56,7 @@ class mod_activitystatus_mod_form extends moodleform_mod {
                 }
                 $mform->addElement('html', html_writer::start_div('displayorder', ['name' => 'displayorder']));
                 $mform->addElement('select', 'displayorder_mod_' . $cm->id, get_string('displayorder', 'mod_activitystatus'), $displayorderoptions);
-                $mform->setDefault('displayorder_mod_' . $cm->id, 1);
+                $mform->setDefault('displayorder_mod_' . $cm->id, 0);
                 $mform->addHelpButton('displayorder_mod_' . $cm->id, 'displayorder', 'activitystatus');
                 $mform->addElement('html', html_writer::end_div());
                 $mform->addElement('html', html_writer::end_div());

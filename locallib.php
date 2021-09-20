@@ -141,7 +141,7 @@ function activitystatus_get_displayorder($array, $type, $id) {
             return $item->displayorder;
         }
     }
-    return 1;
+    return 0;
 }
 
 function activitystatus_icons_order($displayorder) {

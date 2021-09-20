@@ -89,7 +89,8 @@
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
-}   
+    display: inline-block;
+}
 
 #page-mod-activitystatus-mod #fitem_id_default_status,
 #page-mod-activitystatus-mod #fitem_id_default_background {

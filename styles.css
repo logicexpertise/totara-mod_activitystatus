@@ -43,8 +43,7 @@
 }
 
 .activity.activitystatus .modcontainer {
-    display: inline-block;
-    width: 31%;
+    display: block;
     padding-left: 1%;
     padding-right: 1%;
     vertical-align: text-top;
@@ -66,10 +65,16 @@
     float: left !important;
 }
 
+.activitystatus .contentwithoutlink {
+    display: block !important;
+}
+
 .activitystatus.statusimage {
     display: inline-block;
-    padding: 2% 1%;
+    padding: 8px;
     text-align: center;
+    width: 100%;
+    height: auto;
 }
 
 .activitystatus.statusimage img {
@@ -83,13 +88,17 @@
 
 .activity.activitystatus .widgetcontents {
     padding: 3% 0;
+    /* fix scroll bar caused by margins on built-in .row class */
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .activity.activitystatus .widgetcontainer {
     background-repeat: no-repeat;
-    background-size: contain;
+    background-size: cover;
     background-position: center;
-    display: inline-block;
+    display: block;
+    width: 100%;
 }
 
 #page-mod-activitystatus-mod #fitem_id_default_status,
